@@ -1,11 +1,11 @@
-load(":aoc_year.bzl", "year_repo")
+load("//aoc:year.bzl", "year_repo")
 
 use_year = tag_class(
     attrs = {
-        "year": attr.int(),
         "cookie_file": attr.label(
             default = "//.aoc_cookie",
         ),
+        "year": attr.int(),
     },
 )
 

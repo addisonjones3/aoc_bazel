@@ -10,16 +10,12 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
-multitool.hub(lockfile = "//:tools.lock.json")
+multitool.hub(lockfile = "//tools:tools.lock.json")
 use_repo(multitool, "multitool")
 
-aoc_input = use_extension("//tools:extensions.bzl", "aoc_puzzle_input")
+aoc_input = use_extension("//:extensions.bzl", "aoc_puzzle_input")
 aoc_input.use_year(
     cookie_file = "//:.aoc_cookie",
-    year = 2024,
+    year = 2025,
 )
-aoc_input.use_year(
-    cookie_file = "//:.aoc_cookie",
-    year = 2023,
-)
-use_repo(aoc_input, "aoc2023", "aoc2024")
+use_repo(aoc_input, "aoc2024", "aoc2025")

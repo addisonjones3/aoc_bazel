@@ -1,4 +1,4 @@
 bazel-*
 .aoc_cookie
 
-MODULE.lock.bazel
+MODULE.bazel.lock

@@ -32,8 +32,8 @@ def _year_repo_impl(ctx):
 
 year_repo = repository_rule(
     attrs = {
-        "year": attr.int(),
         "auth": attr.string(),
+        "year": attr.int(),
     },
     implementation = _year_repo_impl,
 )
