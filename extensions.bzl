@@ -1,4 +1,4 @@
-load("//aoc:year.bzl", "year_repo")
+load("//aoc:defs.bzl", "year_repo")
 
 use_year = tag_class(
     attrs = {

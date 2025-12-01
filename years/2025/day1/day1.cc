@@ -14,9 +14,11 @@ int main(int argc, char *argv[]) {
   if (!input_file) {
     std::cout << "Bad input file" << std::endl;
   }
-  std::string lineStr;
-  while (getline(input_file, lineStr)) {
-    std::cout << lineStr << std::endl;
+  std::string line_str;
+  int line_count = 0;
+  while (getline(input_file, line_str)) {
+    std::cout << line_str << std::endl;
+    line_count++;
   }
 
   input_file.close();
@@ -24,6 +26,6 @@ int main(int argc, char *argv[]) {
   std::string output_file_path = argv[2];
   std::cout << "Writing test output to file " << output_file_path << std::endl;
   std::ofstream output_file(output_file_path);
-  output_file << "Test output";
+  output_file << line_count;
   output_file.close();
 }

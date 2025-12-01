@@ -18,4 +18,4 @@ aoc_input.use_year(
     cookie_file = "//:.aoc_cookie",
     year = 2025,
 )
-use_repo(aoc_input, "aoc2024", "aoc2025")
+use_repo(aoc_input, "aoc2025")

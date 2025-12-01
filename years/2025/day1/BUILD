@@ -10,6 +10,7 @@ cc_binary(
 
 day_run(
     name = "day1_run",
-    input = ":sample_input.txt",
+    # input = ":sample_input.txt",
+    input = "@aoc2025//:day1.txt",
     solver = ":day1",
 )

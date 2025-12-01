@@ -26,7 +26,7 @@ def _day_run_rule_impl(ctx):
         executable = ctx.executable.solver,
         outputs = [output],
         inputs = [ctx.file.input],
-        arguments = [ctx.file.input.short_path, output.path],
+        arguments = [ctx.file.input.path, output.path],
     )
 
     return [
