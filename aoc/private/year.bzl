@@ -1,4 +1,5 @@
 """stuff"""
+
 COUNT_DAYS = {
     2025: 12,
 }
@@ -17,17 +18,20 @@ def _year_repo_impl(ctx):
         result = ctx.execute([
             "curl",
             input_url_base.format(ctx.attr.year, day),
-            "-L",  # take redirects
+            "-fL",  # fail fast, take redirects
             "--cookie",
             ctx.attr.auth,
         ])
 
+        content = ""
         if result.return_code != 0:
-            fail("failed to get input:", result.stderr)
+            content = result.stderr
+        else:
+            content = result.stdout
 
         ctx.file(
             "day{0}.txt".format(day),
-            content = result.stdout,
+            content = content,
         )
 
 year_repo = repository_rule(

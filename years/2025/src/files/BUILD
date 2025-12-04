@@ -1,0 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "files",
+    srcs = [
+        "files.cc",
+    ],
+    hdrs = ["files.h"],
+    deps = [
+        "@fmt",
+    ],
+)

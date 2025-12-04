@@ -21,7 +21,6 @@ day_run = macro(
 
 def _day_run_rule_impl(ctx):
     output = ctx.actions.declare_file("{0}.output".format(ctx.attr.name))
-    print(output.path)
     ctx.actions.run(
         executable = ctx.executable.solver,
         outputs = [output],

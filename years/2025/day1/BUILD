@@ -4,13 +4,23 @@ load("//aoc:defs.bzl", "day_run")
 exports_files(["sample_input.txt"])
 
 cc_binary(
+    name = "day1_test",
+    srcs = [":test.cc"],
+    deps = ["//years/2025/src/dial"],
+)
+
+cc_binary(
     name = "day1",
     srcs = [":day1.cc"],
+    deps = [
+        "//years/2025/src/dial",
+        "//years/2025/src/files",
+    ],
 )
 
 day_run(
     name = "day1_run",
-    # input = ":sample_input.txt",
-    input = "@aoc2025//:day1.txt",
+    input = ":sample_input.txt",
+    # input = "@aoc2025//:day1.txt",
     solver = ":day1",
 )

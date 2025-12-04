@@ -1,4 +1,11 @@
+# bazel meta
 bazel-*
+MODULE.bazel.lock
+user.bazelrc
+
+# auth for aoc
 .aoc_cookie
 
-MODULE.bazel.lock
+# cpp compile commands for lsp configs
+.cache
+compile_commands.json

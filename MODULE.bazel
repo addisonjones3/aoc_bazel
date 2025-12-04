@@ -8,10 +8,32 @@ bazel_dep(name = "rules_multitool", version = "1.9.0")
 bazel_dep(name = "bazelrc-preset.bzl", version = "1.5.1")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "fmt", version = "12.1.0")
+bazel_dep(name = "googletest", version = "1.17.0")
+
+bazel_dep(name = "rules_python", version = "1.7.0", dev_dependency = True)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    ignore_root_user_error = True,
+    is_default = True,
+    python_version = "3.11",
+)
+
+bazel_dep(name = "wolfd_bazel_compile_commands", version = "0.5.2")
 
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
 multitool.hub(lockfile = "//tools:tools.lock.json")
 use_repo(multitool, "multitool")
+
+bazel_dep(name = "hermetic_cc_toolchain", version = "4.0.1")
+
+toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+use_repo(toolchains, "zig_sdk")
+
+# register_toolchains(
+#     "@zig_sdk//toolchain:darwin_arm64",
+# )
 
 aoc_input = use_extension("//:extensions.bzl", "aoc_puzzle_input")
 aoc_input.use_year(
