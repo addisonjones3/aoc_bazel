@@ -10,7 +10,6 @@ struct DialTurn {
   int distance;
 };
 
-std::string TurnDirectionStr(TurnDirection direction);
 DialTurn ParseStrDialTurn(std::string);
 std::vector<DialTurn> ParseDialTurnStrings(std::vector<std::string> lines);
 
@@ -27,9 +26,9 @@ class Dial {
 
  public:
   Dial(int max_position, int initial_positition, int password_position);
+  Dial(int max_position, int initial_positition, int password_position, PasswordCheckerType checker_type);
   void TurnDial(DialTurn turn);
   void TurnDial(std::vector<DialTurn> turns);
-  void SetCheckerType(PasswordCheckerType type);
   int GetPosition();
   int GetPasswordCount();
 };

@@ -1,6 +1,9 @@
-#include "dial.h"
+#include "dial.hpp"
 
+#include <cstdlib>
 #include <iostream>
+#include <iterator>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -18,32 +21,22 @@ std::ostream& operator<<(std::ostream& os, TurnDirection const& td) {
   };
 };
 
-std::string TurnDirectionStr(TurnDirection direction) {
-  switch (direction) {
-    case TurnDirection::LEFT:
-      return "LEFT";
-    case TurnDirection::RIGHT:
-      return "RIGHT";
-  }
-};
-
 DialTurn ParseStrDialTurn(std::string str) {
+  std::string digits_str = str.substr(1, str.length());
   DialTurn turn;
   switch (str[0]) {
     case 'L':
       turn.direction = TurnDirection::LEFT;
+      turn.distance = -std::stoi(digits_str);
       break;
     case 'R':
       turn.direction = TurnDirection::RIGHT;
+      turn.distance = std::stoi(digits_str);
       break;
     default:
       std::string err = fmt::format("{:s} not a valid turn format\n", str);
       throw std::invalid_argument(err);
   };
-
-  std::string digits_str = str.substr(1, str.length());
-  int distance = std::stoi(digits_str);
-  turn.distance = distance;
 
   return turn;
 };
@@ -65,56 +58,72 @@ Dial::Dial(int max_position, int initial_positition, int password_position) {
   password_position_ = password_position;
 };
 
+Dial::Dial(int max_position, int initial_positition, int password_position, PasswordCheckerType checker_type) {
+  max_position_ = max_position;
+  dial_positition_ = initial_positition;
+  count_positions_ = max_position_ + 1;
+  password_position_ = password_position;
+  checker_type_ = checker_type;
+};
+
 void Dial::TurnDial(DialTurn turn) {
-  std::cout << "starting dial position is " << dial_positition_ << std::endl;
-  int start_position = dial_positition_;
-  int new_position = dial_positition_;
-  int floor_distance = turn.distance % count_positions_;
-  int count_passes = 0;
-  int rel_position = 0;
+  // std::cout << "initial dial position: " << dial_positition_ << std::endl;
+  int initial_position = dial_positition_;
 
-  switch (turn.direction) {
-    case dial::TurnDirection::RIGHT:
-      new_position += floor_distance;
-      std::cout << "turning " << turn.distance << " " << turn.direction << std::endl;
-      rel_position = start_position + turn.distance;
-      break;
-    case dial::TurnDirection::LEFT:
-      new_position -= floor_distance;
-      std::cout << "turning " << turn.distance << " " << turn.direction << std::endl;
-      rel_position = start_position - turn.distance;
-      break;
-  };
+  // std::cout << "turning " << turn.distance << " " << turn.direction << std::endl;
+  // std::cout << "turn.distance % count_positions_ " << turn.distance % count_positions_ << std::endl;
 
-  std::cout << "new_position: " << new_position << std::endl;
-  std::cout << "rel_position: " << rel_position << std::endl;
+  int count_rotations = std::abs(turn.distance / count_positions_);
+  // std::cout << "count_rotations: " << count_rotations << std::endl;
 
-  if (new_position < 0) {
-    count_passes++;
-    count_passes += std::abs(rel_position) / count_positions_;
-  };
+  int next_position;
+  next_position = (dial_positition_ + (turn.distance % count_positions_));
+  // std::cout << "next_position " << next_position << std::endl;
+  int abs_position = dial_positition_ + turn.distance;
+  // std::cout << "abs_position " << abs_position << std::endl;
 
-  std::cout << "count passes: " << count_passes << std::endl;
-
-  if (new_position < 0) {
-    dial_positition_ = new_position + count_positions_;
-  } else if (new_position > max_position_) {
-    dial_positition_ = new_position - count_positions_;
+  if (next_position < 0) {
+    dial_positition_ = next_position + count_positions_;
+  } else if (next_position >= count_positions_) {
+    dial_positition_ = next_position - count_positions_;
   } else {
-    dial_positition_ = new_position;
-  };
+    dial_positition_ = next_position;
+  }
 
-  if (dial_positition_ > max_position_ || dial_positition_ < 0) {
-    std::cout << "dial position is now " << dial_positition_ << " and something went really wrong" << std::endl;
-  };
-  std::cout << "dial position is now " << dial_positition_ << std::endl;
-  if (dial_positition_ == password_position_) {
-    std::cout << "should increment password count" << std::endl;
-    password_count_++;
-  };
-  if (checker_type_ == PasswordCheckerType::PASS_ZERO) {
-    password_count_ += count_passes;
-  };
+  // std::cout << "ending dial position: " << dial_positition_ << std::endl;
+
+  int count_clicks = 0;
+  switch (turn.direction) {
+    case TurnDirection::RIGHT:
+      count_clicks += abs_position / count_positions_;
+      break;
+    case TurnDirection::LEFT:
+      if (abs_position <= 0) {
+        if (initial_position > 0) {
+          count_clicks++;
+        }
+        count_clicks += count_rotations;
+      }
+      break;
+  }
+
+  // std::cout << count_clicks << " click(s)" << std::endl;
+  switch (checker_type_) {
+    case PasswordCheckerType::PASS_ZERO:
+      if (count_clicks > 0) {
+        std::cout << "incrementing password " << count_clicks << " clicks" << std::endl;
+      }
+      password_count_ += count_clicks;
+      break;
+    case PasswordCheckerType::ON_ZERO:
+      if (dial_positition_ == 0) {
+        std::cout << "incrementing password count on 0" << std::endl;
+        password_count_++;
+      }
+      break;
+  }
+
+  // std::cout << std::endl;
 };
 
 void Dial::TurnDial(std::vector<DialTurn> turns) {
@@ -122,8 +131,6 @@ void Dial::TurnDial(std::vector<DialTurn> turns) {
     TurnDial(turn);
   }
 };
-
-void Dial::SetCheckerType(PasswordCheckerType type) { checker_type_ = type; };
 
 int Dial::GetPosition() { return dial_positition_; };
 int Dial::GetPasswordCount() { return password_count_; };

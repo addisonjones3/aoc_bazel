@@ -1,4 +1,4 @@
-#include "dial.h"
+#include "dial.hpp"
 
 #include <gtest/gtest.h>
 
@@ -8,7 +8,7 @@
 
 TEST(DialTest, BasicAssertions) {
   dial::DialTurn expected_turn;
-  expected_turn.distance = 48;
+  expected_turn.distance = -48;
   expected_turn.direction = dial::TurnDirection::LEFT;
 
   dial::DialTurn good_turn = dial::ParseStrDialTurn("L48");
@@ -28,7 +28,7 @@ TEST(DialTurn, TestTurnDial) {
   EXPECT_EQ(d.GetPosition(), expected_position);
 
   expected_position = 98;
-  dial::DialTurn turn_neg_3 = {dial::TurnDirection::LEFT, 3};
+  dial::DialTurn turn_neg_3 = {dial::TurnDirection::LEFT, -3};
   d.TurnDial(turn_neg_3);
 
   EXPECT_EQ(d.GetPosition(), expected_position);
@@ -62,10 +62,32 @@ TEST(DialTurnVec, TestTurnDailVecOfTurns) {
 TEST(DialIncrementsPasswordCount, TestIncrementPassword) {
   dial::Dial d = dial::Dial(99, 0, 0);
   dial::DialTurn turn_1 = {dial::TurnDirection::RIGHT, 1};
-  dial::DialTurn turn_neg_1 = {dial::TurnDirection::LEFT, 1};
+  dial::DialTurn turn_neg_1 = {dial::TurnDirection::LEFT, -1};
 
   d.TurnDial(turn_1);
+  EXPECT_EQ(d.GetPasswordCount(), 0);
+  EXPECT_EQ(d.GetPosition(), 1);
   d.TurnDial(turn_neg_1);
+  EXPECT_EQ(d.GetPasswordCount(), 1);
+  EXPECT_EQ(d.GetPosition(), 0);
+}
+
+TEST(PassZeroTest, TestPassZero) {
+  dial::Dial d = dial::Dial(99, 50, 0, dial::PasswordCheckerType::PASS_ZERO);
+
+  dial::DialTurn turn_1 = {dial::TurnDirection::LEFT, -68};
+  d.TurnDial(turn_1);
 
   EXPECT_EQ(d.GetPasswordCount(), 1);
+  EXPECT_EQ(d.GetPosition(), 82);
+
+  d.TurnDial(dial::DialTurn{dial::TurnDirection::LEFT, -30});
+
+  EXPECT_EQ(d.GetPasswordCount(), 1);
+  EXPECT_EQ(d.GetPosition(), 52);
+
+  d.TurnDial(dial::DialTurn{dial::TurnDirection::RIGHT, 48});
+
+  EXPECT_EQ(d.GetPasswordCount(), 2);
+  EXPECT_EQ(d.GetPosition(), 0);
 }

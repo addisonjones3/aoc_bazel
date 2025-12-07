@@ -7,7 +7,7 @@ cc_library(
     srcs = [
         "files.cc",
     ],
-    hdrs = ["files.h"],
+    hdrs = ["files.hpp"],
     deps = [
         "@fmt",
     ],

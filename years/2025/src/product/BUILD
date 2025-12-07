@@ -3,21 +3,18 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "dial",
+    name = "product",
     srcs = [
-        "dial.cc",
+        "product.cc",
     ],
-    hdrs = ["dial.hpp"],
-    deps = [
-        "@fmt",
-    ],
+    hdrs = ["product.hpp"],
 )
 
 cc_test(
-    name = "dial_test",
-    srcs = ["dial_test.cc"],
+    name = "product_test",
+    srcs = ["product_test.cc"],
     deps = [
-        ":dial",
+        ":product",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],

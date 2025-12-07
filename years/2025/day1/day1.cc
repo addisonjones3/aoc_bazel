@@ -19,12 +19,13 @@ int main(int argc, char* argv[]) {
 
   std::vector<dial::DialTurn> turns = dial::ParseDialTurnStrings(lines);
 
+  // dial::Dial d = dial::Dial(99, 50, 0, dial::PasswordCheckerType::PASS_ZERO);
   dial::Dial d = dial::Dial(99, 50, 0);
-  d.SetCheckerType(dial::PasswordCheckerType::PASS_ZERO);
   d.TurnDial(turns);
 
   std::string output_file_path = argv[2];
   std::ofstream output_file(output_file_path);
 
   output_file << d.GetPasswordCount();
+  std::cout << d.GetPasswordCount() << std::endl;
 }
