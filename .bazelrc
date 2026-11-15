@@ -3,3 +3,5 @@ build:linux --sandbox_add_mount_pair=/tmp
 build:macos --sandbox_add_mount_pair=/var/tmp
 build:windows --sandbox_add_mount_pair=C:\Temp
 
+common --experimental_isolated_extension_usages
+common --@rules_go//go/config:pure

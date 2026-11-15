@@ -1,43 +1,64 @@
 module(
-    name = "aoc_2025",
+    name = "aoc_bazel",
     version = "0.0.0",
 )
 
-bazel_dep(name = "bazel_env.bzl", version = "0.5.0")
-bazel_dep(name = "rules_multitool", version = "1.9.0")
-bazel_dep(name = "bazelrc-preset.bzl", version = "1.5.1")
-bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "rules_cc", version = "0.2.14")
-bazel_dep(name = "fmt", version = "12.1.0")
-bazel_dep(name = "googletest", version = "1.17.0")
+bazel_dep(name = "gazelle", version = "0.54.0")
 
-bazel_dep(name = "rules_python", version = "1.7.0", dev_dependency = True)
+GAZELLE_RUST_COMMIT = "747482bfad721b0fe7198c94491d76c32b263ac0"
 
-python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(
-    ignore_root_user_error = True,
-    is_default = True,
-    python_version = "3.11",
-)
-
-bazel_dep(name = "wolfd_bazel_compile_commands", version = "0.5.2")
-
-multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
-multitool.hub(lockfile = "//tools:tools.lock.json")
-use_repo(multitool, "multitool")
-
-bazel_dep(name = "hermetic_cc_toolchain", version = "4.0.1")
-
-toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
-use_repo(toolchains, "zig_sdk")
-
-# register_toolchains(
-#     "@zig_sdk//toolchain:darwin_arm64",
+bazel_dep(name = "gazelle_rust", version = "0.1.0")
+# archive_override(
+#     module_name = "gazelle_rust",
+#     patch_strip = 1,
+#     # patches = ["//private/patches:gazelle_rust_parser_edition_2024.patch"],
+#     strip_prefix = "gazelle_rust-{}".format(GAZELLE_RUST_COMMIT),
+#     urls = ["https://github.com/Calsign/gazelle_rust/archive/{}.zip".format(GAZELLE_RUST_COMMIT)],
 # )
 
-aoc_input = use_extension("//:extensions.bzl", "aoc_puzzle_input")
-aoc_input.use_year(
-    cookie_file = "//:.aoc_cookie",
-    year = 2025,
+bazel_dep(name = "rules_rs", version = "0.0.96")
+bazel_dep(name = "llvm", version = "0.8.11")
+bazel_dep(name = "platforms", version = "1.1.0")
+
+bazel_dep(name = "rules_go", version = "0.65.0", dev_dependency = True)
+
+bazel_dep(name = "rules_aoc", version = "0.0.0")
+local_path_override(
+    module_name = "rules_aoc",
+    path = "../rules_aoc",
 )
-use_repo(aoc_input, "aoc2025")
+
+toolchains = use_extension("@rules_rs//rs/toolchains:module_extension.bzl", "toolchains")
+toolchains.toolchain(
+    edition = "2024",
+    version = "1.100.0",
+)
+use_repo(toolchains, "default_rust_toolchains")
+
+# This extension is optional but can help keep existing `@rules_rust` references working.
+rules_rust = use_extension("@rules_rs//rs:rules_rust.bzl", "rules_rust")
+use_repo(rules_rust, "rules_rust")
+
+register_toolchains(
+    "@default_rust_toolchains//:all",
+    "@llvm//toolchain:all",
+)
+
+crate = use_extension("@rules_rs//rs:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lock = "//:Cargo.lock",
+    cargo_toml = "//:Cargo.toml",
+    platform_triples = [
+        "aarch64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+    ],
+)
+use_repo(crate, "crates")
+
+aoc_input = use_extension("@rules_aoc//:extensions.bzl", "aoc_puzzle_input")
+aoc_input.input_hub(
+    cookie_file = "//:.aoc_cookie",
+    use_years = [2023],
+)
+use_repo(aoc_input, "aoc_files")

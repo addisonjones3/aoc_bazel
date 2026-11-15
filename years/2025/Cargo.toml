@@ -1,0 +1,10 @@
+[package]
+name = "rust_2025"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[[bin]]
+path = "src/bin/day1.rs"
+name = "day1"

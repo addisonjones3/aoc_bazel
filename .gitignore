@@ -6,6 +6,10 @@ user.bazelrc
 # auth for aoc
 .aoc_cookie
 
-# cpp compile commands for lsp configs
-.cache
-compile_commands.json
+# for my personal instruction benefits
+INSTRUCTION.md
+
+/.cargo
+# Added by cargo
+
+**/target

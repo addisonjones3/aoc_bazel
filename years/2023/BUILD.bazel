@@ -1,0 +1,40 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+
+rust_library(
+    name = "rust_2023_lib",
+    srcs = [
+        "src/day1/mod.rs",
+        "src/day1/solve.rs",
+        "src/lib.rs",
+    ],
+    compile_data = ["Cargo.toml"],
+    crate_name = "rust_2023",
+    edition = "2024",
+    visibility = ["//visibility:public"],
+    deps = ["@crates//:anyhow"],
+)
+
+rust_binary(
+    name = "rust_2023",
+    srcs = ["src/main.rs"],
+    compile_data = ["Cargo.toml"],
+    data = [
+        "@aoc_files//2023/day1:input",
+        "@aoc_files//2023/day1:sample1",
+        "@aoc_files//2023/day1:sample2",
+    ],
+    edition = "2024",
+    env = {},
+    visibility = ["//visibility:public"],
+    deps = [
+        ":rust_2023_lib",
+        "@crates//:runfiles",
+    ],
+)
+
+rust_binary(
+    name = "day1",
+    compile_data = ["Cargo.toml"],
+    edition = "2024",
+    visibility = ["//visibility:public"],
+)

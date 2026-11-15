@@ -1,0 +1,11 @@
+# [package]
+# name = "aoc_bazel"
+# version = "0.1.0"
+# edition = "2024"
+[resolver]
+
+[workspace]
+members = ["years/2023",
+	"years/2025",
+]
+resolver = "3"

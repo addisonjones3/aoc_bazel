@@ -1,0 +1,50 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+
+exports_files(
+    glob(["Cargo*"]),
+)
+
+rust_binary(
+    name = "aoc_2025",
+    srcs = [
+        "src/main.rs",
+        "src/tools/dial.rs",
+        "src/tools/mod.rs",
+    ],
+    # deps = ["//years/2025/src/tools"],
+)
+
+rust_test(
+    name = "test_dial",
+    srcs = [
+        "src/tools/dial.rs",
+    ],
+    data = ["day1:sample_input.txt"],
+)
+
+rust_library(
+    name = "rust_2025",
+    srcs = [
+        "src/dial.rs",
+        "src/lib.rs",
+    ],
+    compile_data = ["Cargo.toml"],
+    edition = "2024",
+    visibility = ["//visibility:public"],
+)
+
+rust_binary(
+    name = "day1",
+    srcs = ["src/bin/day1.rs"],
+    compile_data = ["Cargo.toml"],
+    edition = "2024",
+    visibility = ["//visibility:public"],
+    deps = [":rust_2025"],
+)
+
+rust_test(
+    name = "rust_2025_test",
+    compile_data = ["Cargo.toml"],
+    crate = ":rust_2025",
+    edition = "2024",
+)
