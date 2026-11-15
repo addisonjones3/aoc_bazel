@@ -12,4 +12,6 @@ INSTRUCTION.md
 /.cargo
 # Added by cargo
 
+/.rules_rust_analyzer
+
 **/target
