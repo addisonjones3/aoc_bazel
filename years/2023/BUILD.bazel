@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "rust_2023_lib",
@@ -10,7 +10,13 @@ rust_library(
     deps = [
         "@crates//:anyhow",
         "@crates//:clap",
+        "@crates//:nom",
     ],
+)
+
+rust_test(
+    name = "rust_2023_lib_test",
+    crate = ":rust_2023_lib",
 )
 
 rust_binary(
@@ -29,9 +35,9 @@ rust_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":rust_2023_lib",
-        "@crates//:runfiles",
-        "@crates//:clap",
         "@crates//:anyhow",
+        "@crates//:clap",
+        "@crates//:runfiles",
     ],
 )
 
