@@ -54,7 +54,7 @@ impl Dial {
         Dial {
             current_position: starting_pos,
             click_count: 0,
-            count_positions: count_positions,
+            count_positions,
         }
     }
 

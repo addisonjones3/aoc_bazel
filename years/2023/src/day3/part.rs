@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use nom::{
     IResult, Parser,
     branch::alt,
@@ -12,8 +14,15 @@ pub type Span<'a> = LocatedSpan<&'a str>;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Location {
-    begin: usize,
-    end: usize,
+    pub x_begin: usize,
+    pub x_end: usize,
+    pub row: u32,
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct Point {
+    x: usize,
+    y: u32,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -26,7 +35,6 @@ pub enum Kind {
 pub struct Token {
     pub kind: Kind,
     pub location: Location,
-    pub row: u32,
 }
 
 pub fn parse_kind(input: Span) -> IResult<Span, Kind> {
@@ -42,16 +50,44 @@ pub fn parse_token(input: Span) -> IResult<Span, Token> {
         .map(|(pos, kind, end)| Token {
             kind,
             location: Location {
-                begin: pos.location_offset(),
-                end: end.location_offset() - 1,
+                x_begin: pos.location_offset(),
+                x_end: end.location_offset() - 1,
+                row: pos.location_line() - 1,
             },
-            row: pos.location_line() - 1,
         })
         .parse(input)
 }
 
 pub fn parse_tokens(input: Span) -> IResult<Span, Vec<Token>> {
     many0(preceded(take_while(|c| c == '.'), parse_token)).parse(input)
+}
+
+#[derive(Debug, Default)]
+pub struct TokenMap {
+    tokens: Vec<Token>,
+    map: HashMap<Point, usize>,
+}
+
+impl TokenMap {
+    pub fn from_vec(tokens: Vec<Token>) -> Self {
+        let mut tm: TokenMap = Default::default();
+        for (i, token) in tokens.into_iter().enumerate() {
+            for x in token.location.x_begin..token.location.x_end {
+                tm.map.insert(
+                    Point {
+                        x,
+                        y: token.location.row,
+                    },
+                    i,
+                );
+            }
+            tm.tokens.insert(i, token);
+        }
+        tm
+    }
+    pub fn get(&self, p: &Point) -> Option<&Token> {
+        self.map.get(p).and_then(|&i| self.tokens.get(i))
+    }
 }
 
 #[cfg(test)]
@@ -65,21 +101,30 @@ mod test {
 
     const COMBINED_STR: &str = "..467....123..*";
     const TOK_467: Token = Token {
-        location: Location { begin: 2, end: 4 },
+        location: Location {
+            x_begin: 2,
+            x_end: 4,
+            row: 0,
+        },
         kind: Kind::Part(467),
-        row: 0,
     };
 
     const TOK_123: Token = Token {
-        location: Location { begin: 9, end: 11 },
+        location: Location {
+            x_begin: 9,
+            x_end: 11,
+            row: 0,
+        },
         kind: Kind::Part(123),
-        row: 0,
     };
 
     const TOK_STAR: Token = Token {
-        location: Location { begin: 14, end: 14 },
+        location: Location {
+            x_begin: 14,
+            x_end: 14,
+            row: 0,
+        },
         kind: Kind::Symbol('*'),
-        row: 0,
     };
 
     #[test]
