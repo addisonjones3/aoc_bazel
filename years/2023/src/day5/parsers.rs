@@ -4,16 +4,16 @@ use nom::{
     IResult, Parser,
     branch::alt,
     bytes::complete::tag,
-    character::complete::{alpha1, line_ending, space0, space1, u32 as parse_u32},
+    character::complete::{alpha1, line_ending, space0, space1, usize as parse_usize},
     combinator::eof,
     multi::{separated_list0, separated_list1},
     sequence::{delimited, preceded, separated_pair, terminated},
 };
 
-fn parse_seeds(input: &str) -> IResult<&str, Vec<u32>> {
+fn parse_seeds(input: &str) -> IResult<&str, Vec<usize>> {
     delimited(
         tag("seeds: "),
-        separated_list1(space0, parse_u32),
+        separated_list1(space0, parse_usize),
         line_ending,
     )
     .parse(input)
@@ -21,9 +21,9 @@ fn parse_seeds(input: &str) -> IResult<&str, Vec<u32>> {
 
 fn parse_range_mapper(input: &str) -> IResult<&str, RangeMapper> {
     (
-        parse_u32,
-        preceded(space1, parse_u32),
-        preceded(space1, parse_u32),
+        parse_usize,
+        preceded(space1, parse_usize),
+        preceded(space1, parse_usize),
     )
         .map(|(destination, source, range)| RangeMapper {
             source,
@@ -60,7 +60,7 @@ fn parse_category_maps(input: &str) -> IResult<&str, Vec<CategoryMap>> {
     separated_list0(parse_blank_line, parse_category_map).parse(input)
 }
 
-pub fn parse_blocks(input: &str) -> IResult<&str, (Vec<u32>, Vec<CategoryMap>)> {
+pub fn parse_blocks(input: &str) -> IResult<&str, (Vec<usize>, Vec<CategoryMap>)> {
     separated_pair(parse_seeds, parse_blank_line, parse_category_maps).parse(input)
 }
 
@@ -156,7 +156,7 @@ soil-to-fertilizer map:
     fn test_parse_full_example() {
         let s_to_s = want_seed_to_soil();
         let s_to_f = want_soil_to_fertilizer();
-        let seeds: Vec<u32> = vec![79, 14, 55, 13];
+        let seeds: Vec<usize> = vec![79, 14, 55, 13];
         let (_, (got_seeds, got_cms)) = parse_blocks(EXAMPLE_FULL).expect("could not parse");
 
         assert_eq!(seeds, got_seeds);

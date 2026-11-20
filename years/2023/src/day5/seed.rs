@@ -2,19 +2,19 @@ use iddqd::{IdOrdItem, IdOrdMap, id_upcast};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct RangeMapper {
-    pub source: u32,
-    pub destination: u32,
-    pub range: u32,
+    pub source: usize,
+    pub destination: usize,
+    pub range: usize,
 }
 
 impl RangeMapper {
-    pub fn map(&self, num: u32) -> u32 {
+    pub fn map(&self, num: usize) -> usize {
         if (self.source..(self.source + self.range)).contains(&num) {
             return (num - self.source) + self.destination;
         }
         num
     }
-    pub fn contains(&self, num: u32) -> bool {
+    pub fn contains(&self, num: usize) -> bool {
         (self.source..(self.source + self.range + 1)).contains(&num)
     }
 }
@@ -27,7 +27,7 @@ pub struct CategoryMap {
 }
 
 impl CategoryMap {
-    pub fn map(&self, num: u32) -> u32 {
+    pub fn map(&self, num: usize) -> usize {
         self.mappers
             .iter()
             .find(|m| m.contains(num))
@@ -48,7 +48,7 @@ impl IdOrdItem for CategoryMap {
 
 pub type CMMap = IdOrdMap<CategoryMap>;
 
-fn walk_destination(num: u32, cm_map: &CMMap, first_name: String) -> u32 {
+fn walk_destination(num: usize, cm_map: &CMMap, first_name: String) -> usize {
     let mut curr_num = num;
     let mut curr_name = first_name.as_str();
 
@@ -59,7 +59,7 @@ fn walk_destination(num: u32, cm_map: &CMMap, first_name: String) -> u32 {
     curr_num
 }
 
-pub fn min_destination(seeds: Vec<u32>, cm_map: &CMMap, first_name: String) -> Option<u32> {
+pub fn min_destination(seeds: Vec<usize>, cm_map: &CMMap, first_name: String) -> Option<usize> {
     seeds
         .iter()
         .copied()
@@ -70,6 +70,7 @@ pub fn min_destination(seeds: Vec<u32>, cm_map: &CMMap, first_name: String) -> O
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::day5::parsers::parse_blocks;
     const MAPPER_1: RangeMapper = RangeMapper {
         destination: 50,
         source: 98,
@@ -99,10 +100,10 @@ mod test {
             mappers: vec![MAPPER_1, MAPPER_2],
         };
 
-        let num1: u32 = 99;
-        let want1: u32 = 51;
-        let num2: u32 = 53;
-        let want2: u32 = 55;
+        let num1: usize = 99;
+        let want1: usize = 51;
+        let num2: usize = 53;
+        let want2: usize = 55;
 
         let got1 = cm.map(num1);
         assert_eq!(want1, got1);
@@ -139,7 +140,7 @@ soil-to-fertilizer map:
         assert_eq!("", rest);
 
         let cm_map = CMMap::from_iter(cm);
-        let destinations: Vec<u32> = seeds
+        let destinations: Vec<usize> = seeds
             .iter()
             .copied()
             .map(|seed| walk_destination(seed, &cm_map, String::from("seed")))
