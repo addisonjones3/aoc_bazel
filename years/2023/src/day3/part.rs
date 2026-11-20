@@ -139,7 +139,6 @@ mod test {
     #[test]
     fn test_parse_line() {
         let (_, tokens) = parse_tokens(Span::new(COMBINED_STR)).expect("parse error");
-        eprintln!("{tokens:?}");
         assert_eq!(tokens[0], TOK_467);
         assert_eq!(tokens[1], TOK_123);
         assert_eq!(tokens[2], TOK_STAR);
