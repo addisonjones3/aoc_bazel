@@ -19,6 +19,21 @@ fn parse_seeds(input: &str) -> IResult<&str, Vec<usize>> {
     .parse(input)
 }
 
+fn parse_seed_pairs(input: &str) -> IResult<&str, Vec<usize>> {
+    delimited(
+        tag("seeds: "),
+        separated_list0(space1, separated_pair(parse_usize, space1, parse_usize)),
+        alt((eof, line_ending)),
+    )
+    .map(|pairs| {
+        pairs
+            .into_iter()
+            .flat_map(|(begin, range_len)| begin..=(begin + range_len))
+            .collect()
+    })
+    .parse(input)
+}
+
 fn parse_range_mapper(input: &str) -> IResult<&str, RangeMapper> {
     (
         parse_usize,
@@ -62,6 +77,10 @@ fn parse_category_maps(input: &str) -> IResult<&str, Vec<CategoryMap>> {
 
 pub fn parse_blocks(input: &str) -> IResult<&str, (Vec<usize>, Vec<CategoryMap>)> {
     separated_pair(parse_seeds, parse_blank_line, parse_category_maps).parse(input)
+}
+
+pub fn parse_range_blocks(input: &str) -> IResult<&str, (Vec<usize>, Vec<CategoryMap>)> {
+    separated_pair(parse_seed_pairs, parse_blank_line, parse_category_maps).parse(input)
 }
 
 #[cfg(test)]
@@ -128,6 +147,14 @@ soil-to-fertilizer map:
                 },
             ],
         }
+    }
+
+    #[test]
+    fn test_parse_seed_pairs() {
+        let want = vec![1, 2, 3, 4, 5, 6, 7];
+        let seeds_str = "seeds: 1 3 5 2";
+        let (_, got) = parse_seed_pairs(seeds_str).expect("bad parse");
+        assert_eq!(got, want);
     }
 
     #[test]

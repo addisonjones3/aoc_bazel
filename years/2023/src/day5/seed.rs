@@ -31,7 +31,6 @@ impl CategoryMap {
         self.mappers
             .iter()
             .find(|m| m.contains(num))
-            .inspect(|m| eprintln!("found mapper {m:?}"))
             .map_or(num, |m| m.map(num))
     }
 }
