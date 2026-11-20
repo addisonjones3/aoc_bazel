@@ -3,6 +3,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod parsers;
 
 use crate::day1::solve::DAY1_SOLVER;
 use crate::day2::solve::DAY2_SOLVER;

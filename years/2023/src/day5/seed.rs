@@ -1,42 +1,162 @@
-use nom::{
-    IResult, Parser,
-    bytes::complete::tag,
-    character::complete::{space0, space1, u32 as parse_u32},
-    multi::separated_list1,
-    sequence::{delimited, preceded, separated_pair},
-};
+use iddqd::{IdOrdItem, IdOrdMap, id_upcast};
 
-fn parse_seeds(input: &str) -> IResult<&str, Vec<u32>> {
-    preceded(tag("seeds: "), separated_list1(space0, parse_u32)).parse(input)
-}
-
+#[derive(Debug, PartialEq, Eq)]
 pub struct RangeMapper {
-    source: u32,
-    destination: u32,
-    range: u32,
+    pub source: u32,
+    pub destination: u32,
+    pub range: u32,
 }
 
 impl RangeMapper {
     pub fn map(&self, num: u32) -> u32 {
-        match (self.source..(self.source + self.range))
-            .contains(&num)
-            .then_some(num)
-        {
-            Some(num) => (num - self.source) + self.destination,
-            None => num,
+        if (self.source..(self.source + self.range)).contains(&num) {
+            return (num - self.source) + self.destination;
         }
+        num
+    }
+    pub fn contains(&self, num: u32) -> bool {
+        (self.source..(self.source + self.range + 1)).contains(&num)
     }
 }
 
-pub struct CatMap {}
+#[derive(Debug, PartialEq, Eq)]
+pub struct CategoryMap {
+    pub name: String,
+    pub next_name: String,
+    pub mappers: Vec<RangeMapper>,
+}
+
+impl CategoryMap {
+    pub fn map(&self, num: u32) -> u32 {
+        self.mappers
+            .iter()
+            .find(|m| m.contains(num))
+            .inspect(|m| eprintln!("found mapper {m:?}"))
+            .map_or(num, |m| m.map(num))
+    }
+}
+
+impl IdOrdItem for CategoryMap {
+    type Key<'a> = &'a str;
+
+    fn key(&self) -> Self::Key<'_> {
+        &self.name
+    }
+
+    id_upcast!();
+}
+
+pub type CMMap = IdOrdMap<CategoryMap>;
+
+fn walk_destination(num: u32, cm_map: &CMMap, first_name: String) -> u32 {
+    let mut curr_num = num;
+    let mut curr_name = first_name.as_str();
+
+    while let Some(cm) = cm_map.get(curr_name) {
+        curr_num = cm.map(curr_num);
+        curr_name = cm.next_name.as_str();
+    }
+    curr_num
+}
+
+pub fn min_destination(seeds: Vec<u32>, cm_map: &CMMap, first_name: String) -> Option<u32> {
+    seeds
+        .iter()
+        .copied()
+        .map(|seed| walk_destination(seed, cm_map, first_name.clone()))
+        .min()
+}
 
 #[cfg(test)]
 mod test {
     use super::*;
-    const MAPPER_1: RangeMapper = {source:  }
+    const MAPPER_1: RangeMapper = RangeMapper {
+        destination: 50,
+        source: 98,
+        range: 2,
+    };
+
+    const MAPPER_2: RangeMapper = RangeMapper {
+        destination: 52,
+        source: 50,
+        range: 48,
+    };
 
     #[test]
     fn test_range() {
-        let got = 
+        let got = MAPPER_1.map(99);
+        assert_eq!(51, got);
+
+        let got = MAPPER_1.map(1);
+        assert_eq!(1, got);
+    }
+
+    #[test]
+    fn test_cm_map() {
+        let cm = CategoryMap {
+            name: "".to_string(),
+            next_name: "".to_string(),
+            mappers: vec![MAPPER_1, MAPPER_2],
+        };
+
+        let num1: u32 = 99;
+        let want1: u32 = 51;
+        let num2: u32 = 53;
+        let want2: u32 = 55;
+
+        let got1 = cm.map(num1);
+        assert_eq!(want1, got1);
+        let got2 = cm.map(num2);
+        assert_eq!(want2, got2);
+    }
+
+    const EXAMPLE_FULL: &str = "seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15";
+
+    #[test]
+    fn test_walk_destination() {
+        let (rest, (seeds, cm)) = parse_blocks(EXAMPLE_FULL).expect("couldn't parse");
+        assert_eq!("", rest);
+
+        let cm_map = CMMap::from_iter(cm);
+        let want = 81;
+        eprintln!("{cm_map:?}");
+        let got = walk_destination(seeds[0], &cm_map, String::from("seed"));
+        assert_eq!(want, got);
+    }
+
+    #[test]
+    fn test_walk_destinations() {
+        let (rest, (seeds, cm)) = parse_blocks(EXAMPLE_FULL).expect("couldn't parse");
+        assert_eq!("", rest);
+
+        let cm_map = CMMap::from_iter(cm);
+        let destinations: Vec<u32> = seeds
+            .iter()
+            .copied()
+            .map(|seed| walk_destination(seed, &cm_map, String::from("seed")))
+            .collect();
+
+        assert_eq!(destinations, vec![81, 53, 57, 52]);
+    }
+
+    #[test]
+    fn test_min_destination() {
+        let (rest, (seeds, cm)) = parse_blocks(EXAMPLE_FULL).expect("couldn't parse");
+        assert_eq!("", rest);
+
+        let cm_map = CMMap::from_iter(cm);
+        let min_destination =
+            min_destination(seeds, &cm_map, String::from("seed")).expect("should be a value");
+
+        assert_eq!(52, min_destination);
     }
 }

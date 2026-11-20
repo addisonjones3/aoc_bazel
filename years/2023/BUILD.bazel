@@ -10,6 +10,7 @@ rust_library(
     deps = [
         "@crates//:anyhow",
         "@crates//:clap",
+        "@crates//:iddqd",
         "@crates//:nom",
         "@crates//:nom_locate",
     ],
