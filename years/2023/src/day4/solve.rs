@@ -6,7 +6,7 @@ use nom::{
     multi::separated_list1,
     sequence::{delimited, preceded, separated_pair},
 };
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 use crate::Solver;
 
