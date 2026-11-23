@@ -43,6 +43,8 @@ rust_binary(
         "@aoc_files//2023/day8:input",
         "@aoc_files//2023/day8:sample1",
         "@aoc_files//2023/day8:sample2",
+        "@aoc_files//2023/day9:input",
+        "@aoc_files//2023/day9:sample1",
     ],
     edition = "2024",
     env = {},

@@ -6,6 +6,7 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 pub mod parsers;
 
 use crate::day1::solve::DAY1_SOLVER;
@@ -16,6 +17,7 @@ use crate::day5::solve::DAY5_SOLVER;
 use crate::day6::solve::DAY6_SOLVER;
 use crate::day7::solve::DAY7_SOLVER;
 use crate::day8::solve::DAY8_SOLVER;
+use crate::day9::solve::DAY9_SOLVER;
 
 use anyhow::{Error, anyhow};
 use clap::Parser;
@@ -93,6 +95,12 @@ pub fn get_solver_fn(args: Args) -> Result<SolverFn, Error> {
             _day = {
                 _solver = DAY8_SOLVER;
                 8
+            };
+        }
+        9 => {
+            _day = {
+                _solver = DAY9_SOLVER;
+                9
             };
         }
         _ => return Err(anyhow!("day {:?} is not implemented yet", args.day)),
