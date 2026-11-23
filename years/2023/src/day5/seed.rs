@@ -128,7 +128,7 @@ soil-to-fertilizer map:
 
         let cm_map = CMMap::from_iter(cm);
         let want = 81;
-        eprintln!("{cm_map:?}");
+        // eprintln!("{cm_map:?}");
         let got = walk_destination(seeds[0], &cm_map, String::from("seed"));
         assert_eq!(want, got);
     }
