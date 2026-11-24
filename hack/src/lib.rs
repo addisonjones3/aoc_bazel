@@ -57,7 +57,7 @@ pub fn lookup_solver_fn(args: Args, solvers: &[Solver]) -> Result<SolverFn, Erro
         .ok_or_else(|| anyhow!("day {day} not implemented"))
 }
 
-fn read_input(day: u8, sample: Option<u8>) -> Result<String, Error> {
+fn read_input(year: u32, day: u8, sample: Option<u8>) -> Result<String, Error> {
     let r = Runfiles::create().context("couldn't create runfiles")?;
 
     let file_str = match sample {
@@ -67,13 +67,13 @@ fn read_input(day: u8, sample: Option<u8>) -> Result<String, Error> {
 
     eprintln!("day: {day}, file_str: {file_str}");
 
-    let path = runfiles::rlocation!(r, format!("aoc_files/2023/day{day}/{file_str}"))
+    let path = runfiles::rlocation!(r, format!("aoc_files/{year}/day{day}/{file_str}"))
         .ok_or_else(|| anyhow!("couldn't find runfile for day {day}, {file_str}"))?;
     fs::read_to_string(&path).with_context(|| format!("couldn't read {}", path.display()))
 }
 
-pub fn run(args: Args, solvers: &[Solver]) -> Result<String, Error> {
-    let input = read_input(args.day, args.sample)?;
+pub fn run(args: Args, year: u32, solvers: &[Solver]) -> Result<String, Error> {
+    let input = read_input(year, args.day, args.sample)?;
     let solver_fn = lookup_solver_fn(args, solvers)?;
     solver_fn(&input)
 }
