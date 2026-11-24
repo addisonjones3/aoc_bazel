@@ -5,27 +5,6 @@ rust_library(
     srcs = glob(["src/**/*.rs"]),
     compile_data = ["Cargo.toml"],
     crate_name = "rust_2023",
-    edition = "2024",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@crates//:anyhow",
-        "@crates//:clap",
-        "@crates//:iddqd",
-        "@crates//:nom",
-        "@crates//:nom_locate",
-        "@crates//:num",
-    ],
-)
-
-rust_test(
-    name = "rust_2023_lib_test",
-    crate = ":rust_2023_lib",
-)
-
-rust_binary(
-    name = "rust_2023",
-    srcs = ["src/main.rs"],
-    compile_data = ["Cargo.toml"],
     data = [
         "@aoc_files//2023/day1:input",
         "@aoc_files//2023/day1:sample1",
@@ -47,13 +26,38 @@ rust_binary(
         "@aoc_files//2023/day9:sample1",
     ],
     edition = "2024",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hack",
+        "@crates//:anyhow",
+        "@crates//:clap",
+        "@crates//:iddqd",
+        "@crates//:nom",
+        "@crates//:nom_locate",
+        "@crates//:num",
+        "@crates//:runfiles",
+    ],
+)
+
+rust_test(
+    name = "rust_2023_lib_test",
+    compile_data = ["Cargo.toml"],
+    crate = ":rust_2023_lib",
+    edition = "2024",
+)
+
+rust_binary(
+    name = "rust_2023",
+    srcs = ["src/main.rs"],
+    compile_data = ["Cargo.toml"],
+    edition = "2024",
     env = {},
     visibility = ["//visibility:public"],
     deps = [
         ":rust_2023_lib",
+        "//hack",
         "@crates//:anyhow",
         "@crates//:clap",
-        "@crates//:runfiles",
     ],
 )
 

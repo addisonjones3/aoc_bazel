@@ -1,0 +1,13 @@
+[package]
+name = "hack"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+iddqd = { workspace = true }
+nom = { workspace = true }
+nom_locate = { workspace = true }
+num = { workspace = true }
+runfiles = { workspace = true }

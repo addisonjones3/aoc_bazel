@@ -135,6 +135,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
+name = "hack"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "iddqd",
+ "nom",
+ "nom_locate",
+ "num",
+ "runfiles",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -296,11 +309,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc1beaa13fbade520858d2f6ed799f2a963d0ef32d15506ccf290b6e14dfd560"
 
 [[package]]
+name = "rust_2019"
+version = "0.1.0"
+
+[[package]]
 name = "rust_2023"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "hack",
  "iddqd",
  "nom",
  "nom_locate",

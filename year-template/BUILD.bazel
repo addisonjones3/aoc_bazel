@@ -1,0 +1,41 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+
+exports_files(["Cargo.toml"])
+
+rust_library(
+    name = "rust_{{project-name}}_lib",
+    srcs = glob(["src/**/*.rs"]),
+    compile_data = ["Cargo.toml"],
+    crate_name = "rust_{{project-name}}",
+    data = [],
+    edition = "2024",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hack",
+        "@crates//:anyhow",
+        "@crates//:clap",
+        "@crates//:nom",
+    ],
+)
+
+rust_test(
+    name = "rust_{{project-name}}_lib_test",
+    compile_data = ["Cargo.toml"],
+    crate = ":rust_{{project-name}}_lib",
+    edition = "2024",
+)
+
+rust_binary(
+    name = "rust_{{project-name}}",
+    srcs = ["src/main.rs"],
+    compile_data = ["Cargo.toml"],
+    edition = "2024",
+    env = {},
+    visibility = ["//visibility:public"],
+    deps = [
+        ":rust_{{project-name}}_lib",
+        "//hack",
+        "@crates//:anyhow",
+        "@crates//:clap",
+    ],
+)
