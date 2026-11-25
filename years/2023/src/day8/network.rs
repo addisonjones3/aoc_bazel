@@ -32,7 +32,7 @@ pub enum EndType {
 }
 
 pub fn node_map_steps_to_final(
-    steps: &Vec<Step>,
+    steps: &[Step],
     nm: &NodeMap,
     origin_node_name: &str,
     end_type: EndType,
